@@ -74,6 +74,14 @@
       box-shadow: 0 8px 16px rgba(16, 185, 129, 0.4);
       transform: translateY(-2px);
     }
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      transition: all 0.3s ease;
+    }
+    .btn-whatsapp:hover {
+      box-shadow: 0 8px 16px rgba(37, 211, 102, 0.4);
+      transform: translateY(-2px);
+    }
     .glass-effect {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
@@ -342,13 +350,18 @@
               </div>
             ` : ''}
             
-            <div class="flex gap-3">
+            <div class="grid grid-cols-3 gap-2">
               <a href="tel:${item.phone}" 
-                class="flex-1 btn-call text-white font-semibold py-3 px-4 rounded-xl text-sm text-center flex items-center justify-center gap-2">
+                class="btn-call text-white font-semibold py-3 px-2 rounded-xl text-xs text-center flex items-center justify-center">
                 📞 Call
               </a>
+              <a href="https://wa.me/91${item.phone}?text=Hello%20${encodeURIComponent(item.name)},%20this%20is%20regarding%20your%20Care%20Supreme%20policy%20${item.policy}%20expiring%20on%20${encodeURIComponent(item.date)}" 
+                target="_blank"
+                class="btn-whatsapp text-white font-semibold py-3 px-2 rounded-xl text-xs text-center flex items-center justify-center">
+                💬 WhatsApp
+              </a>
               <button onclick="openModal('${item.policy}')" 
-                class="flex-1 btn-primary text-white font-semibold py-3 px-4 rounded-xl text-sm">
+                class="btn-primary text-white font-semibold py-3 px-2 rounded-xl text-xs">
                 Update
               </button>
             </div>
