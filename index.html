@@ -225,6 +225,24 @@
         </div>
       </div>
 
+      <!-- Restore Backup Section -->
+      <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-3xl p-6 border-2 border-orange-100 shadow-sm">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-2xl flex-shrink-0">
+            ⚡
+          </div>
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Restore from Backup</h3>
+            <p class="text-sm text-gray-600 mb-4 leading-relaxed">Upload previously exported CSV file to restore all data including complete disposition history and notes.</p>
+            
+            <input type="file" id="backupFileInput" accept=".csv" class="hidden" onchange="handleBackupRestore(event)">
+            <button onclick="document.getElementById('backupFileInput').click()" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white font-semibold py-3 px-5 rounded-xl text-sm hover:shadow-lg transition-all">
+              📥 Restore Backup
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Stats Section -->
       <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-3xl p-6 border-2 border-purple-100 shadow-sm">
         <div class="flex items-start gap-4">
@@ -1003,6 +1021,220 @@ This special offer is valid only for today. Would you like to proceed with the r
       }, 0);
       
       alert(`✅ Export Successful!\n\n📊 Summary:\n• Total Leads: ${data.length}\n• Total Interactions: ${totalCalls}\n• File: ${fileName}\n\n✨ Export includes complete disposition logs with date, time, status, notes, and callbacks for each customer interaction.`);
+    }
+
+    function handleBackupRestore(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!confirm('⚠️ Restore from backup?\n\nThis will replace ALL current data with the backup data.\n\nAre you sure you want to continue?')) {
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result;
+          const rows = text.split('\n').map(row => {
+            const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            return matches ? matches.map(cell => cell.replace(/^"|"$/g, '').trim()) : [];
+          }).filter(row => row.length > 0);
+          
+          if (rows.length < 2) {
+            alert('❌ Invalid backup file format');
+            event.target.value = '';
+            return;
+          }
+          
+          const headers = rows[0].map(h => h.toLowerCase().trim());
+          
+          // Validate backup file headers
+          const requiredHeaders = ['policy no', 'customer name', 'phone number', 'plan name', 'renewal date', 
+                                   'sum insured', 'total premium', 'addon cost', 'age/dob', 
+                                   'current status', 'latest notes', 'callback date/time', 'last updated', 
+                                   'total calls', 'complete disposition log'];
+          
+          const hasAllHeaders = requiredHeaders.every(rh => 
+            headers.some(h => h === rh)
+          );
+          
+          if (!hasAllHeaders) {
+            alert('❌ This is not a valid backup file.\n\nPlease upload a file exported from this system.');
+            event.target.value = '';
+            return;
+          }
+          
+          const restoredData = [];
+          const restoredDispositions = {};
+          let successCount = 0;
+          let errorCount = 0;
+          
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.length < 10) continue;
+            
+            try {
+              const getCell = (colName) => {
+                const idx = headers.indexOf(colName.toLowerCase());
+                return idx >= 0 && idx < row.length ? row[idx] : '';
+              };
+              
+              const policy = getCell('policy no');
+              const name = getCell('customer name');
+              const phone = getCell('phone number').replace(/[^0-9]/g, '');
+              const planName = getCell('plan name');
+              const renewalDate = getCell('renewal date');
+              const sumInsured = getCell('sum insured');
+              const premium = parseInt(getCell('total premium').replace(/[^0-9]/g, '')) || 0;
+              const addonCost = parseInt(getCell('addon cost').replace(/[^0-9]/g, '')) || 0;
+              const ageDob = getCell('age/dob');
+              const currentStatus = getCell('current status').toLowerCase().replace(/ /g, '_');
+              const notes = getCell('latest notes');
+              const callbackStr = getCell('callback date/time');
+              const lastUpdatedStr = getCell('last updated');
+              const dispositionLog = getCell('complete disposition log');
+              
+              if (!policy || !name || !phone) {
+                errorCount++;
+                continue;
+              }
+              
+              // Restore customer data
+              const item = {
+                sno: restoredData.length + 1,
+                policy: policy,
+                name: name,
+                phone: phone,
+                date: renewalDate,
+                plan: `${planName} - SI: ${sumInsured}`,
+                dob: ageDob,
+                amount: premium,
+                sumInsured: sumInsured,
+                addonCost: addonCost
+              };
+              
+              restoredData.push(item);
+              
+              // Restore disposition data
+              const disposition = {
+                status: currentStatus === 'pending' ? 'pending' : currentStatus,
+                notes: notes && notes !== 'No notes added' ? notes : '',
+                callback: null,
+                lastUpdated: null,
+                history: []
+              };
+              
+              // Parse callback
+              if (callbackStr && callbackStr !== 'Not Scheduled') {
+                try {
+                  const cbParts = callbackStr.split(' at ');
+                  if (cbParts.length === 2) {
+                    const cbDate = new Date(cbParts[0] + ' ' + cbParts[1]);
+                    if (!isNaN(cbDate.getTime())) {
+                      disposition.callback = cbDate.toISOString();
+                    }
+                  }
+                } catch (e) {
+                  console.warn('Could not parse callback date:', e);
+                }
+              }
+              
+              // Parse last updated
+              if (lastUpdatedStr && lastUpdatedStr !== 'Never') {
+                try {
+                  const luParts = lastUpdatedStr.split(' at ');
+                  if (luParts.length === 2) {
+                    const luDate = new Date(luParts[0] + ' ' + luParts[1]);
+                    if (!isNaN(luDate.getTime())) {
+                      disposition.lastUpdated = luDate.toISOString();
+                    }
+                  }
+                } catch (e) {
+                  console.warn('Could not parse last updated:', e);
+                }
+              }
+              
+              // Parse disposition history
+              if (dispositionLog && dispositionLog !== 'No interaction history available') {
+                const logEntries = dispositionLog.split(' || ');
+                
+                logEntries.forEach(entry => {
+                  try {
+                    // Format: Call 1: [05 Oct 2025 at 02:30 PM] Status: INTERESTED | Notes: text | Callback Scheduled: ...
+                    const callMatch = entry.match(/Call \d+: \[(.*?)\] Status: (.*?) \| Notes: (.*?)(?:\s*\|\s*Callback Scheduled: (.*))?$/);
+                    
+                    if (callMatch) {
+                      const timestamp = new Date(callMatch[1]);
+                      const status = callMatch[2].toLowerCase().replace(/ /g, '_');
+                      const histNotes = callMatch[3] && callMatch[3] !== 'No notes' ? callMatch[3] : '';
+                      const callbackPart = callMatch[4];
+                      
+                      const histEntry = {
+                        status: status,
+                        notes: histNotes,
+                        timestamp: timestamp.toISOString(),
+                        callback: null
+                      };
+                      
+                      if (callbackPart) {
+                        try {
+                          const cbDate = new Date(callbackPart);
+                          if (!isNaN(cbDate.getTime())) {
+                            histEntry.callback = cbDate.toISOString();
+                          }
+                        } catch (e) {
+                          console.warn('Could not parse callback in history:', e);
+                        }
+                      }
+                      
+                      disposition.history.push(histEntry);
+                    }
+                  } catch (e) {
+                    console.warn('Error parsing history entry:', e);
+                  }
+                });
+              }
+              
+              restoredDispositions[policy] = disposition;
+              successCount++;
+              
+            } catch (err) {
+              errorCount++;
+              console.warn(`Error processing row ${i}:`, err);
+            }
+          }
+          
+          if (successCount === 0) {
+            alert('❌ No valid data found in backup file');
+            event.target.value = '';
+            return;
+          }
+          
+          // Apply restored data
+          data.length = 0;
+          data.push(...restoredData);
+          
+          dispositions = restoredDispositions;
+          
+          // Save to localStorage
+          localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(dispositions));
+          
+          // Refresh UI
+          renderCards();
+          updateCounts();
+          
+          alert(`✅ Backup Restored Successfully!\n\n📊 Summary:\n• Leads Restored: ${successCount}\n• Total Interactions: ${Object.values(dispositions).reduce((sum, d) => sum + (d.history || []).length, 0)}\n${errorCount > 0 ? `\n⚠️ ${errorCount} rows had errors and were skipped.` : ''}\n\n✨ All customer data, dispositions, notes, callbacks, and complete history have been restored.`);
+          
+        } catch (error) {
+          alert('❌ Error reading backup file: ' + error.message);
+          console.error('Backup restore error:', error);
+        }
+      };
+      
+      reader.readAsText(file);
+      event.target.value = '';
     }
 
     loadDispositions();
