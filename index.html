@@ -366,6 +366,17 @@ This special offer is valid only for today. Would you like to proceed with the r
         return;
       }
 
+      // Sort by disposition timestamp (newest first) if in contacted tab
+      if (currentTab === 'contacted') {
+        filtered.sort((a, b) => {
+          const dispA = getDisposition(a.policy);
+          const dispB = getDisposition(b.policy);
+          const timeA = dispA.lastUpdated ? new Date(dispA.lastUpdated).getTime() : 0;
+          const timeB = dispB.lastUpdated ? new Date(dispB.lastUpdated).getTime() : 0;
+          return timeB - timeA; // Newest first
+        });
+      }
+
       filtered.forEach(item => {
         const disp = getDisposition(item.policy);
         const hasCallback = disp.callback && new Date(disp.callback) > new Date();
