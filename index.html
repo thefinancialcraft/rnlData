@@ -190,30 +190,57 @@
 
   <script>
     const data = [
-      {sno:1, policy:"90931696", date:"11-Oct-2025", name:"Boya Tribhuvan Teja", phone:"9885562055", plan:"Care Supreme - SI: ₹17,50,000", dob:"32 yrs", amount:7562, addon:"Unlimited Care - ₹645"},
-      {sno:2, policy:"91075578", date:"12-Oct-2025", name:"Gurparshad Singh", phone:"9501242244", plan:"Care Supreme - SI: ₹15,00,000 (4 members)", dob:"47, 44, 18, 14 yrs", amount:46627, addon:"Unlimited Care - ₹2,151"},
-      {sno:3, policy:"90931524", date:"13-Oct-2025", name:"Boya Varalakshmi Dev", phone:"9885562055", plan:"Care Supreme - SI: ₹17,50,000", dob:"65 yrs", amount:105604, addon:"Unlimited Care - ₹2,796"},
-      {sno:4, policy:"90936353", date:"14-Oct-2025", name:"Manu Bai Vishnoi", phone:"9167631985", plan:"Care Supreme - SI: ₹10,50,000", dob:"59 yrs", amount:19922, addon:"Unlimited Care - ₹1,704"},
-      {sno:5, policy:"91374698", date:"17-Oct-2025", name:"Apurva Gupta", phone:"9535684007", plan:"Care Supreme - SI: ₹1,25,00,000 (3 members)", dob:"36, 35, 2 yrs", amount:47884, addon:"None"},
-      {sno:6, policy:"91178196", date:"17-Oct-2025", name:"Omprakash Sahu", phone:"9893830775", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"40, 37, 10, 2 yrs", amount:18158, addon:"Unlimited Care - ₹1,523"},
-      {sno:7, policy:"91270653", date:"20-Oct-2025", name:"Nandala Suresh", phone:"6303951543", plan:"Care Supreme - SI: ₹35,00,000 (3 members)", dob:"46, 40, 25 yrs", amount:42827, addon:"None"},
-      {sno:8, policy:"91290285", date:"21-Oct-2025", name:"Mohammed Shoaib Ul Huq", phone:"9900533007", plan:"Care Supreme - SI: ₹15,00,000 (3 members)", dob:"62, 56, 19 yrs", amount:48373, addon:"Unlimited Care - ₹4,183"},
-      {sno:9, policy:"91347202", date:"22-Oct-2025", name:"Dipan Banerjee", phone:"8584022210", plan:"Care Supreme - SI: ₹15,00,000 (2 members)", dob:"59, 58 yrs", amount:32028, addon:"Unlimited Care - ₹2,737"},
-      {sno:10, policy:"91540681", date:"24-Oct-2025", name:"Shashanka Sekhar Nath", phone:"7381252534", plan:"Care Supreme - SI: ₹10,50,000 (2 members)", dob:"64, 60 yrs", amount:41356, addon:"Unlimited Care - ₹3,585"},
-      {sno:11, policy:"90941094", date:"24-Oct-2025", name:"Mangiiash Anant Ingale", phone:"9860359501", plan:"Care Supreme - SI: ₹15,00,000 (3 members)", dob:"52, 43, 20 yrs", amount:33753, addon:"None"},
-      {sno:12, policy:"91681428", date:"26-Oct-2025", name:"Mrs Santosh", phone:"9760553925", plan:"Care Supreme - SI: ₹15,00,000", dob:"63 yrs", amount:29694, addon:"Unlimited Care - ₹2,592"},
-      {sno:13, policy:"91425871", date:"26-Oct-2025", name:"Nalla Purendar", phone:"9676315560", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"42, 36, 10, 6 yrs", amount:25226, addon:"None"},
-      {sno:14, policy:"90934716", date:"27-Oct-2025", name:"Shyam Kishore", phone:"7090555530", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"39, 30, 7, 2 yrs", amount:21358, addon:"Unlimited Care - ₹1,815"},
-      {sno:15, policy:"90999914", date:"29-Oct-2025", name:"Redy V S R Krishha Kumari", phone:"9030699991", plan:"Care Supreme - SI: ₹62,50,000 (2 members)", dob:"42, 11 yrs", amount:18941, addon:"Unlimited Care - ₹1,248"},
-      {sno:16, policy:"91763194", date:"29-Oct-2025", name:"Lakshmi Narasimha Rao Wunnava", phone:"9742544850", plan:"Care Supreme - SI: ₹25,00,000", dob:"89 yrs", amount:94414, addon:"Unlimited Care - ₹8,541"},
-      {sno:17, policy:"91574188", date:"30-Oct-2025", name:"Dnyaneshwar Hiraman Gaikwad", phone:"9421525223", plan:"Care Supreme - SI: ₹25,00,000 (2 members)", dob:"65, 60 yrs", amount:38495, addon:"None"},
-      {sno:18, policy:"91653682", date:"31-Oct-2025", name:"Shanker Venkata Wunnava", phone:"9742544850", plan:"Care Supreme - SI: ₹37,50,000 (3 members)", dob:"57, 50, 12 yrs", amount:51552, addon:"Unlimited Care - ₹3,562"}
+      {sno:1, policy:"90931696", date:"11-Oct-2025", name:"Boya Tribhuvan Teja", phone:"9885562055", plan:"Care Supreme - SI: ₹17,50,000", dob:"32 yrs", amount:7562, sumInsured:"₹17,50,000", addonCost:645},
+      {sno:2, policy:"91075578", date:"12-Oct-2025", name:"Gurparshad Singh", phone:"9501242244", plan:"Care Supreme - SI: ₹15,00,000 (4 members)", dob:"47, 44, 18, 14 yrs", amount:46627, sumInsured:"₹15,00,000", addonCost:2151},
+      {sno:3, policy:"90931524", date:"13-Oct-2025", name:"Boya Varalakshmi Dev", phone:"9885562055", plan:"Care Supreme - SI: ₹17,50,000", dob:"65 yrs", amount:105604, sumInsured:"₹17,50,000", addonCost:2796},
+      {sno:4, policy:"90936353", date:"14-Oct-2025", name:"Manu Bai Vishnoi", phone:"9167631985", plan:"Care Supreme - SI: ₹10,50,000", dob:"59 yrs", amount:19922, sumInsured:"₹10,50,000", addonCost:1704},
+      {sno:5, policy:"91374698", date:"17-Oct-2025", name:"Apurva Gupta", phone:"9535684007", plan:"Care Supreme - SI: ₹1,25,00,000 (3 members)", dob:"36, 35, 2 yrs", amount:47884, sumInsured:"₹1,25,00,000", addonCost:0},
+      {sno:6, policy:"91178196", date:"17-Oct-2025", name:"Omprakash Sahu", phone:"9893830775", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"40, 37, 10, 2 yrs", amount:18158, sumInsured:"₹25,00,000", addonCost:1523},
+      {sno:7, policy:"91270653", date:"20-Oct-2025", name:"Nandala Suresh", phone:"6303951543", plan:"Care Supreme - SI: ₹35,00,000 (3 members)", dob:"46, 40, 25 yrs", amount:42827, sumInsured:"₹35,00,000", addonCost:0},
+      {sno:8, policy:"91290285", date:"21-Oct-2025", name:"Mohammed Shoaib Ul Huq", phone:"9900533007", plan:"Care Supreme - SI: ₹15,00,000 (3 members)", dob:"62, 56, 19 yrs", amount:48373, sumInsured:"₹15,00,000", addonCost:4183},
+      {sno:9, policy:"91347202", date:"22-Oct-2025", name:"Dipan Banerjee", phone:"8584022210", plan:"Care Supreme - SI: ₹15,00,000 (2 members)", dob:"59, 58 yrs", amount:32028, sumInsured:"₹15,00,000", addonCost:2737},
+      {sno:10, policy:"91540681", date:"24-Oct-2025", name:"Shashanka Sekhar Nath", phone:"7381252534", plan:"Care Supreme - SI: ₹10,50,000 (2 members)", dob:"64, 60 yrs", amount:41356, sumInsured:"₹10,50,000", addonCost:3585},
+      {sno:11, policy:"90941094", date:"24-Oct-2025", name:"Mangiiash Anant Ingale", phone:"9860359501", plan:"Care Supreme - SI: ₹15,00,000 (3 members)", dob:"52, 43, 20 yrs", amount:33753, sumInsured:"₹15,00,000", addonCost:0},
+      {sno:12, policy:"91681428", date:"26-Oct-2025", name:"Mrs Santosh", phone:"9760553925", plan:"Care Supreme - SI: ₹15,00,000", dob:"63 yrs", amount:29694, sumInsured:"₹15,00,000", addonCost:2592},
+      {sno:13, policy:"91425871", date:"26-Oct-2025", name:"Nalla Purendar", phone:"9676315560", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"42, 36, 10, 6 yrs", amount:25226, sumInsured:"₹25,00,000", addonCost:0},
+      {sno:14, policy:"90934716", date:"27-Oct-2025", name:"Shyam Kishore", phone:"7090555530", plan:"Care Supreme - SI: ₹25,00,000 (4 members)", dob:"39, 30, 7, 2 yrs", amount:21358, sumInsured:"₹25,00,000", addonCost:1815},
+      {sno:15, policy:"90999914", date:"29-Oct-2025", name:"Redy V S R Krishha Kumari", phone:"9030699991", plan:"Care Supreme - SI: ₹62,50,000 (2 members)", dob:"42, 11 yrs", amount:18941, sumInsured:"₹62,50,000", addonCost:1248},
+      {sno:16, policy:"91763194", date:"29-Oct-2025", name:"Lakshmi Narasimha Rao Wunnava", phone:"9742544850", plan:"Care Supreme - SI: ₹25,00,000", dob:"89 yrs", amount:94414, sumInsured:"₹25,00,000", addonCost:8541},
+      {sno:17, policy:"91574188", date:"30-Oct-2025", name:"Dnyaneshwar Hiraman Gaikwad", phone:"9421525223", plan:"Care Supreme - SI: ₹25,00,000 (2 members)", dob:"65, 60 yrs", amount:38495, sumInsured:"₹25,00,000", addonCost:0},
+      {sno:18, policy:"91653682", date:"31-Oct-2025", name:"Shanker Venkata Wunnava", phone:"9742544850", plan:"Care Supreme - SI: ₹37,50,000 (3 members)", dob:"57, 50, 12 yrs", amount:51552, sumInsured:"₹37,50,000", addonCost:3562}
     ];
 
     let dispositions = {};
     const STORAGE_KEY = 'rnl_dispositions';
     let currentTab = 'all';
     let currentPolicy = null;
+
+    function getWhatsAppLink(item) {
+      const basePremium = item.amount - item.addonCost;
+      const discountAmount = Math.round(basePremium * 0.05);
+      const finalAmount = basePremium - discountAmount;
+      
+      const message = `Hello ${item.name},
+
+This is regarding your Care Supreme policy renewal:
+
+📋 *Policy Details:*
+Policy No: ${item.policy}
+Sum Insured: ${item.sumInsured}
+Expiry Date: ${item.date}
+
+💰 *Premium Details:*
+Base Premium: ₹${basePremium.toLocaleString("en-IN")}
+
+🎉 *Sunday Exclusive Offer!*
+Pay today and get 5% OFF
+Discount: ₹${discountAmount.toLocaleString("en-IN")}
+*Final Amount: ₹${finalAmount.toLocaleString("en-IN")}*
+
+This special offer is valid only for today. Would you like to proceed with the renewal?`;
+
+      return `https://wa.me/91${item.phone}?text=${encodeURIComponent(message)}`;
+    }
 
     function getDisposition(policy) {
       const d = dispositions[policy];
@@ -338,7 +365,7 @@
             <div class="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-gray-600">
               <div class="font-medium text-gray-700 mb-1">Plan Details</div>
               <div class="leading-relaxed">${item.plan}</div>
-              ${item.addon !== 'None' ? `<div class="mt-2 text-purple-600 font-medium">Add-on: ${item.addon}</div>` : ''}
+              ${item.addonCost > 0 ? `<div class="mt-2 text-purple-600 font-medium">Add-on Cost: ₹${item.addonCost.toLocaleString("en-IN")}</div>` : ''}
             </div>
             
             ${disp.notes ? `
@@ -355,7 +382,7 @@
                 class="btn-call text-white font-semibold py-3 px-2 rounded-xl text-xs text-center flex items-center justify-center">
                 📞 Call
               </a>
-              <a href="https://wa.me/91${item.phone}?text=Hello%20${encodeURIComponent(item.name)},%20this%20is%20regarding%20your%20Care%20Supreme%20policy%20${item.policy}%20expiring%20on%20${encodeURIComponent(item.date)}" 
+              <a href="${getWhatsAppLink(item)}" 
                 target="_blank"
                 class="btn-whatsapp text-white font-semibold py-3 px-2 rounded-xl text-xs text-center flex items-center justify-center">
                 💬 WhatsApp
