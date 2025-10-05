@@ -260,47 +260,6 @@
   <!-- Cards Container -->
   <div id="cardsContainer" class="px-5 pb-6 space-y-4"></div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal hidden">
-    <div class="modal-content bg-white rounded-3xl shadow-2xl mx-4 w-full max-w-md">
-      <div class="sticky top-0 bg-white rounded-t-3xl px-6 py-5 flex justify-between items-center border-b border-gray-100">
-        <h3 class="text-lg font-bold text-gray-800">⚙️ Settings</h3>
-        <button onclick="closeSettingsModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 text-2xl transition-all">×</button>
-      </div>
-      
-      <div class="p-6 space-y-4">
-        <!-- Import Data Section -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
-          <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
-            📥 Import Data
-          </h4>
-          <p class="text-xs text-gray-600 mb-4">Upload CSV file with customer leads</p>
-          
-          <button onclick="downloadSampleTemplate()" class="w-full mb-3 bg-white border-2 border-blue-200 text-blue-600 font-semibold py-2.5 px-4 rounded-xl text-sm hover:bg-blue-50 transition-all">
-            📄 Download Sample Template
-          </button>
-          
-          <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
-          <button onclick="document.getElementById('csvFileInput').click()" class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm hover:shadow-lg transition-all">
-            📤 Upload CSV File
-          </button>
-        </div>
-
-        <!-- Export Data Section -->
-        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-100">
-          <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
-            📤 Export Data
-          </h4>
-          <p class="text-xs text-gray-600 mb-4">Download all leads with disposition history</p>
-          
-          <button onclick="exportData()" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm hover:shadow-lg transition-all">
-            💾 Export to CSV
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Disposition Modal -->
   <div id="dispositionModal" class="modal">
     <div class="modal-content bg-white rounded-3xl shadow-2xl mx-4 w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -429,7 +388,6 @@ This special offer is valid only for today. Would you like to proceed with the r
         dispositions = {};
       }
       
-      // Load custom data if exists
       try {
         const customData = localStorage.getItem(DATA_STORAGE_KEY);
         if (customData) {
@@ -487,7 +445,6 @@ This special offer is valid only for today. Would you like to proceed with the r
           const isDone = disp.status !== 'pending' && disp.status !== 'callback';
           if (!isDone) return false;
           
-          // Apply done filter
           if (currentDoneFilter === 'all') return true;
           return disp.status === currentDoneFilter;
         }
@@ -501,14 +458,13 @@ This special offer is valid only for today. Would you like to proceed with the r
         return;
       }
 
-      // Sort by disposition timestamp (newest first) if in contacted tab
       if (currentTab === 'contacted') {
         filtered.sort((a, b) => {
           const dispA = getDisposition(a.policy);
           const dispB = getDisposition(b.policy);
           const timeA = dispA.lastUpdated ? new Date(dispA.lastUpdated).getTime() : 0;
           const timeB = dispB.lastUpdated ? new Date(dispB.lastUpdated).getTime() : 0;
-          return timeB - timeA; // Newest first
+          return timeB - timeA;
         });
       }
 
@@ -608,7 +564,6 @@ This special offer is valid only for today. Would you like to proceed with the r
       document.getElementById(`tab-${tab}`).classList.add('tab-active');
       document.getElementById(`tab-${tab}`).classList.remove('text-gray-600', 'bg-white');
       
-      // Show/hide elements based on tab
       const searchBar = document.getElementById('searchBar');
       const cardsContainer = document.getElementById('cardsContainer');
       const settingsContent = document.getElementById('settingsContent');
@@ -654,7 +609,6 @@ This special offer is valid only for today. Would you like to proceed with the r
     function setDoneFilter(filter) {
       currentDoneFilter = filter;
       
-      // Update chip styles
       document.querySelectorAll('.chip-filter').forEach(chip => {
         chip.classList.remove('chip-active');
       });
@@ -780,6 +734,276 @@ This special offer is valid only for today. Would you like to proceed with the r
     });
 
     document.getElementById('searchInput').addEventListener('input', renderCards);
+
+    function downloadSampleTemplate() {
+      const headers = ['policy_no', 'proposer', 'phone', 'plan_name', 'renewal_date', 'total_sum_insured', 'total_premium', 'proposed_addon_cost', 'ages'];
+      const sampleData = [
+        ['90931696', 'Boya Tribhuvan Teja', '9885562055', 'Care Supreme', '11-Oct-2025', '₹17,50,000', '7562', '645', '32'],
+        ['91075578', 'Gurparshad Singh', '9501242244', 'Care Supreme', '12-Oct-2025', '₹15,00,000', '46627', '2151', '47, 44, 18, 14'],
+        ['90931524', 'Boya Varalakshmi Dev', '9885562055', 'Care Supreme', '13-Oct-2025', '₹17,50,000', '105604', '2796', '65']
+      ];
+      
+      const rows = [headers, ...sampleData];
+      const csvContent = rows.map(row => row.join(',')).join('\n');
+      
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'Insurance_CRM_Import_Template.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      alert('✅ Template downloaded!\n\nUse these exact column headers:\n• policy_no\n• proposer\n• phone\n• plan_name\n• renewal_date\n• total_sum_insured\n• total_premium\n• proposed_addon_cost\n• ages');
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result;
+          const rows = text.split('\n').map(row => {
+            const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            return matches ? matches.map(cell => cell.replace(/^"|"$/g, '').trim()) : [];
+          }).filter(row => row.length > 0);
+          
+          if (rows.length < 2) {
+            alert('❌ CSV file must have headers and at least one data row');
+            return;
+          }
+          
+          const headers = rows[0].map(h => h.toLowerCase().trim());
+          
+          const requiredCols = ['policy_no', 'proposer', 'phone', 'plan_name', 'renewal_date', 'total_sum_insured', 'total_premium', 'proposed_addon_cost'];
+          const missingCols = requiredCols.filter(col => !headers.includes(col));
+          
+          if (missingCols.length > 0) {
+            alert(`❌ Missing required columns: ${missingCols.join(', ')}\n\nPlease download the sample template and use the correct format.`);
+            return;
+          }
+          
+          const newData = [];
+          let errorCount = 0;
+          
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (row.length < headers.length || !row[0]) continue;
+            
+            try {
+              const getCell = (colName) => {
+                const idx = headers.indexOf(colName.toLowerCase());
+                return idx >= 0 ? row[idx] : '';
+              };
+              
+              const premium = parseInt(getCell('total_premium').replace(/[^0-9]/g, '')) || 0;
+              const addonCost = parseInt(getCell('proposed_addon_cost').replace(/[^0-9]/g, '')) || 0;
+              const sumInsured = getCell('total_sum_insured');
+              const planName = getCell('plan_name');
+              
+              const item = {
+                sno: newData.length + 1,
+                policy: getCell('policy_no'),
+                name: getCell('proposer'),
+                phone: getCell('phone').replace(/[^0-9]/g, ''),
+                date: getCell('renewal_date'),
+                plan: `${planName} - SI: ${sumInsured}`,
+                dob: getCell('ages') || 'N/A',
+                amount: premium,
+                sumInsured: sumInsured,
+                addonCost: addonCost
+              };
+              
+              if (!item.policy || !item.name || !item.phone) {
+                errorCount++;
+                continue;
+              }
+              
+              newData.push(item);
+            } catch (err) {
+              errorCount++;
+              console.warn(`Error processing row ${i}:`, err);
+            }
+          }
+          
+          if (newData.length === 0) {
+            alert('❌ No valid data found in CSV file');
+            return;
+          }
+          
+          const confirmMsg = `Import ${newData.length} new leads?\n\n⚠️ This will replace your current ${data.length} leads.\n${errorCount > 0 ? `\n${errorCount} rows had errors and were skipped.` : ''}`;
+          
+          if (!confirm(confirmMsg)) {
+            return;
+          }
+          
+          data.length = 0;
+          data.push(...newData);
+          
+          localStorage.setItem(DATA_STORAGE_KEY, JSON.stringify(data));
+          
+          renderCards();
+          updateCounts();
+          
+          alert(`✅ Successfully imported ${newData.length} leads!${errorCount > 0 ? `\n⚠️ ${errorCount} rows were skipped due to errors.` : ''}`);
+        } catch (error) {
+          alert('❌ Error reading CSV file: ' + error.message);
+          console.error('Import error:', error);
+        }
+      };
+      
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function exportData() {
+      if (data.length === 0) {
+        alert('❌ No data to export!');
+        return;
+      }
+
+      const headers = [
+        'Policy No',
+        'Customer Name', 
+        'Phone Number',
+        'Plan Name',
+        'Renewal Date',
+        'Sum Insured',
+        'Total Premium',
+        'Addon Cost',
+        'Age/DOB',
+        'Current Status',
+        'Latest Notes',
+        'Callback Date/Time',
+        'Last Updated',
+        'Total Calls',
+        'Complete Disposition Log'
+      ];
+      
+      const exportRows = data.map(item => {
+        const disp = getDisposition(item.policy);
+        const callCount = (disp.history || []).length;
+        
+        const dispositionLog = (disp.history || []).map((h, idx) => {
+          const timestamp = new Date(h.timestamp);
+          const dateStr = timestamp.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+          const timeStr = timestamp.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+          
+          const status = (h.status || 'pending').replace(/_/g, ' ').toUpperCase();
+          const notes = h.notes ? h.notes.trim() : 'No notes';
+          
+          let logEntry = `Call ${idx + 1}: [${dateStr} at ${timeStr}] Status: ${status} | Notes: ${notes}`;
+          
+          if (h.callback) {
+            const cbTime = new Date(h.callback);
+            const cbDateStr = cbTime.toLocaleDateString('en-IN', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            });
+            const cbTimeStr = cbTime.toLocaleTimeString('en-IN', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: true
+            });
+            logEntry += ` | Callback Scheduled: ${cbDateStr} at ${cbTimeStr}`;
+          }
+          
+          return logEntry;
+        }).join(' || ');
+        
+        const currentStatus = (disp.status || 'pending').replace(/_/g, ' ').toUpperCase();
+        
+        let callbackInfo = 'Not Scheduled';
+        if (disp.callback) {
+          const cbTime = new Date(disp.callback);
+          callbackInfo = cbTime.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) + ' at ' + cbTime.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+        
+        let lastUpdated = 'Never';
+        if (disp.lastUpdated) {
+          const luTime = new Date(disp.lastUpdated);
+          lastUpdated = luTime.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) + ' at ' + luTime.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+        
+        return [
+          item.policy,
+          item.name,
+          item.phone,
+          item.plan.split(' - SI:')[0] || item.plan,
+          item.date,
+          item.sumInsured,
+          item.amount,
+          item.addonCost || 0,
+          item.dob,
+          currentStatus,
+          disp.notes || 'No notes added',
+          callbackInfo,
+          lastUpdated,
+          callCount,
+          dispositionLog || 'No interaction history available'
+        ];
+      });
+      
+      const csvRows = [headers, ...exportRows].map(row => {
+        return row.map(cell => {
+          const str = String(cell).replace(/"/g, '""');
+          return `"${str}"`;
+        }).join(',');
+      }).join('\n');
+      
+      const blob = new Blob(['\uFEFF' + csvRows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      const timestamp = new Date();
+      const dateStr = timestamp.toISOString().split('T')[0];
+      const fileName = `Insurance_CRM_Export_${dateStr}.csv`;
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', fileName);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      const totalCalls = data.reduce((sum, item) => {
+        const disp = getDisposition(item.policy);
+        return sum + (disp.history || []).length;
+      }, 0);
+      
+      alert(`✅ Export Successful!\n\n📊 Summary:\n• Total Leads: ${data.length}\n• Total Interactions: ${totalCalls}\n• File: ${fileName}\n\n✨ Export includes complete disposition logs with date, time, status, notes, and callbacks for each customer interaction.`);
+    }
 
     loadDispositions();
     renderCards();
